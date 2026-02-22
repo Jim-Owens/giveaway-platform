@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Item {
+  id           String    @id @default(cuid())
+  type         String    @default("GIVEAWAY") // "GIVEAWAY" or "WANTED"
+  title        String
+  description  String?
+  minPrice     Int
+  deadline     DateTime
+  referenceUrl String?
+  imageUrls    String[]  @default([])
+  creatorName  String
+  editPassword String    @default("0000") // 4-digit PIN for editing
+  status       String    @default("Available") // Available or Resolved
+  createdAt    DateTime  @default(now())
+  comments     Comment[]
+}
+
+model Comment {
+  id            String   @id @default(cuid())
+  item          Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId        String
+  text          String
+  commenterName String
+  createdAt     DateTime @default(now())
+}
